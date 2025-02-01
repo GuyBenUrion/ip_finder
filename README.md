@@ -17,15 +17,15 @@ Whenever a new domain is requested, the previously requested domains and their I
 - [Docker](https://docs.docker.com/get-docker/) installed on your machine.
 - [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
-### Setup
+# Setup
 
-# Clone the repository to your local machine
+### Clone the repository to your local machine
 git clone ip_finder
 
-# Navigate into the project directory
+### Navigate into the project directory
 cd ip_finder
 
-# Build and start all containers using Docker Compose
+### Build and start all containers using Docker Compose
 docker-compose up --build
 
 
