@@ -1,9 +1,11 @@
 # IP Address Finder
 
-A simple web application that performs the following:
+A web application that performs:
 
 1. **Display the host's internal & public IP address.**  
 2. **Resolve and display the IP address(es) for a given domain.**
+
+This project is built using a **FastAPI** backend and a **React** frontend. Both parts are containerized using **Docker** and orchestrated with **Docker Compose**.
 
 ---
 
@@ -19,7 +21,6 @@ A simple web application that performs the following:
 - git clone ip_finder
 - cd ip_finder
 - docker-compose up --build
-
 
 ---
 
