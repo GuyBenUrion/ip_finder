@@ -14,7 +14,7 @@ function App() {
                 const response = await axios.get("http://localhost:8000/api/all_resolved");
                 const storedData = response.data;
     
-                // Convert storedData object into an array with domain, IP, and timestamp
+                // convert storedData object into an array with domain, IP, and timestamp
                 const formattedData = Object.entries(storedData)
                     .map(([domain, data]) => {
                         const ipList = data.ip_addresses; // Extract the IP list

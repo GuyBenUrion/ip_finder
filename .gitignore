@@ -1,0 +1,19 @@
+# Ignore frontend dependencies and cache
+frontend/node_modules/
+frontend/.cache/
+frontend/package-lock.json
+frontend/yarn.lock
+
+# Ignore build files
+frontend/build/
+frontend/dist/
+
+# Ignore logs and linting cache
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.eslintcache
+
+# Ignore Git-related cache files
+frontend/*.pack
+frontend/.gitignore
