@@ -2,6 +2,7 @@ import socket
 import requests
 import dns.resolver
 from fastapi import FastAPI
+from datetime import datetime
 from urllib.parse import urlparse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -28,11 +29,12 @@ def resolve_domain(domain: str):
 
     # parse domain
     parsed_domain = urlparse(domain).netloc if "://" in domain else domain
-
     # check if domain is already resolved, if so dont do anything
     if parsed_domain in resolved_ips:
-        return
+        resolved_ips[parsed_domain]["timestamp"] = datetime.utcnow().isoformat()
+        return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
 
+    print(parsed_domain)
     ipv4_addresses = []
 
     # get IP address for domain
@@ -41,16 +43,18 @@ def resolve_domain(domain: str):
         ipv4_addresses = [answer.to_text() for answer in answers]
     except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
         pass
+    resolved_ips[domain] = {
+        "ip_addresses": ipv4_addresses,
+        "timestamp": datetime.utcnow().isoformat()  # Store timestamp in ISO format
+    }
 
-    # save to global var
-    resolved_ips[parsed_domain] = [ipv4_addresses]
-
-    return [ipv4_addresses]
+    return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
 
 @app.get("/api/all_resolved")
 def get_all_resolved():
-    # send all stored domains and IPs
-    return resolved_ips 
+    # Sort the dictionary by timestamp (descending, newest first)
+    return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
+
 
 @app.get("/api/get_local_ip")
 def get_local_ip():
