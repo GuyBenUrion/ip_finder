@@ -45,7 +45,7 @@ function App() {
     // get domain IP address
     const resolveDomain = async () => {
         if (!domain) return;
-    
+
         try {
             const response = await axios.get(`http://localhost:8000/api/resolve/${domain}`);
             const resolvedData = response.data; // API now returns all resolved domains sorted
@@ -99,14 +99,13 @@ function App() {
                     type="text"
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}
-                    placeholder="Enter domain (e.g., google.com)"
+                    placeholder="Enter domain (e.g., www.google.com)"
                 />
                 <br />
                 <button onClick={resolveDomain}>Resolve</button>
                 <h3>Resolved Domains:</h3>
             </div>
     
-            {/* Scrollable List Section */}
             <div className="scrollable-content">
                 {resolvedIp.length > 0 && (
                     <div>
