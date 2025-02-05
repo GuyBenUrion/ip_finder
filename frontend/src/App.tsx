@@ -5,9 +5,16 @@ import { useQuery, useMutation} from "@tanstack/react-query";
 
 
 function App() {
+
+    type ResolvedIp = {
+        domain: string;
+        domainIp: string;
+        timestamp: string;
+    };
+    
     // get stored IP addresses
-    const {data: resolvedIps, mutate} = useMutation({
-        mutationFn: async (domain) => {
+    const {data: resolvedIps, mutate} = useMutation<ResolvedIp[], Error, string>({
+        mutationFn: async (domain: string) => {
             const response = await axios.post(`http://localhost:8000/api/resolve/${domain}`);
             const storedData = response.data;
 
