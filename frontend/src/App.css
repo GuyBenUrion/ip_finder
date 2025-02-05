@@ -7,7 +7,7 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Align items to the start of the container */
   height: 100vh; /* Full height of the screen */
 }
 
@@ -23,6 +23,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevents full-page scrolling */
+  margin-top: 9%; /* Move 9% down from the top */
 }
 
 /* Fixed header section */
@@ -33,6 +34,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10; /* Keeps it above the scrollable content */
+  /* margin-top: 200px auto; */
 }
 
 /* Scrollable content section */
