@@ -1,19 +1,27 @@
-# Ignore frontend dependencies and cache
-frontend/node_modules/
-frontend/.cache/
-frontend/package-lock.json
-frontend/yarn.lock
-
-# Ignore build files
-frontend/build/
-frontend/dist/
-
-# Ignore logs and linting cache
+# Logs
+frontend/logs
+frontend/*.log
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
-frontend/.eslintcache
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
 
-# Ignore Git-related cache files
-frontend/*.pack
-frontend/.gitignore
+# Node.js Dependencies
+frontend/node_modules
+
+# Build Output
+frontend/dist
+frontend/dist-ssr
+frontend/*.local
+
+# Editor directories and files
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+frontend/.idea
+frontend/.DS_Store
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?

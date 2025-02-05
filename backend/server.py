@@ -18,18 +18,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # store resolved domains and their IPs in memory
 resolved_ips = {}
+
+def get_sorted_resolved_ips():
+    # returns all resolved IPs sorted by the latest timestamp
+    return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
 
 @app.post("/api/resolve/{domain}")  
 def resolve_domain(domain: str):
     # access global var
     global resolved_ips
 
-    if domain == 'all':
-        # need to make another request to get all resolved domains
-        return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
+    # return all resolved IPs
+    if domain == '__fetch_all__':
+        return get_sorted_resolved_ips()
 
     # parse domain
     parsed_domain = urlparse(domain).netloc if "://" in domain else domain
@@ -37,23 +40,21 @@ def resolve_domain(domain: str):
     # check if domain is already resolved, return as latest
     if parsed_domain in resolved_ips:
         resolved_ips[parsed_domain]["timestamp"] = datetime.utcnow().isoformat()
-        return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
-
-    ipv4_addresses = []
+        return get_sorted_resolved_ips()
 
     # get IP address for domain
     try:
         answers = dns.resolver.resolve(parsed_domain, 'A')
         ipv4_addresses = [answer.to_text() for answer in answers]
     except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
-        return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
+        return get_sorted_resolved_ips()
 
     resolved_ips[parsed_domain] = {
         "ip_addresses": ipv4_addresses,
         "timestamp": datetime.utcnow().isoformat()  # Store timestamp in ISO format
     }
 
-    return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
+    return get_sorted_resolved_ips()
 
 
 @app.get("/api/get_local_ip")
