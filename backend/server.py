@@ -46,7 +46,7 @@ def resolve_domain(domain: str):
     try:
         answers = dns.resolver.resolve(parsed_domain, 'A')
         ipv4_addresses = [answer.to_text() for answer in answers]
-    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers):
         return get_sorted_resolved_ips()
 
     resolved_ips[parsed_domain] = {
