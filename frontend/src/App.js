@@ -16,23 +16,21 @@ function App() {
     
                 // convert storedData object into an array with domain, IP, and timestamp
                 const formattedData = Object.entries(storedData)
-                    .map(([domain, data]) => {
-                        const ipList = data.ip_addresses; // Extract the IP list
-                        const timestamp = data.timestamp;
-    
-                        // Ensure it has valid data before saving
-                        if (ipList.length > 0 && ipList[0].trim() !== "") {
-                            return {
-                                domain,
-                                domainIp: ipList.join(", "),
-                                timestamp
-                            };
-                        }
-                        return null; // Exclude invalid entries
-                    })
-                    .filter(entry => entry !== null) // Remove null values
-                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Ensure sorting by latest timestamp
-    
+                .reduce((acc,[domain, data]) => {
+                    const ipList = data.ip_addresses; // Extract the IP list
+                    const timestamp = data.timestamp;
+
+                    // Ensure it has valid data before saving
+                    if (ipList.length > 0 && ipList[0].trim() !== "") {
+                        acc.push({
+                            domain,
+                            domainIp: ipList.join(", "),
+                            timestamp
+                        });
+                    }
+                    return acc;
+                }, []);
+
                 setResolvedIp(formattedData);
             } catch (error) {
                 console.error("Error fetching stored IPs:", error);
@@ -49,6 +47,7 @@ function App() {
         try {
             const response = await axios.get(`http://localhost:8000/api/resolve/${domain}`);
             const resolvedData = response.data; // API now returns all resolved domains sorted
+
 
             // Convert response object to an array and process it
             const formattedData = Object.entries(resolvedData).map(([domain, data]) => ({
