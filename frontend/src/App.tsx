@@ -1,45 +1,66 @@
 import "./App.css";
 import axios from "axios";
-import { useEffect } from "react";
-import { useQuery, useMutation} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
+const ALL_IPS='all_resolved_ip';
+
+interface ResolvedIp {
+    domain: string;
+    domainIp: string;
+    timestamp: string;
+};
+
+interface ResolvedIPs {
+    [domain: string]: {
+    ip_addresses: string[];
+    timestamp: string;
+    };
+}
+
+const arrangeDomin=(resolvedIPs:ResolvedIPs)=>{
+    return Object.entries(resolvedIPs)
+    .reduce((acc,[domain, domainData]) => {
+        const ipList = domainData.ip_addresses; // Extract the IP list
+        const timestamp = domainData.timestamp;
+
+        // Ensure it has valid data before saving
+        if (ipList.length > 0 && ipList[0].trim() !== "") {
+            acc.push({
+                domain,
+                domainIp: ipList.join(", "),
+                timestamp
+            });
+        }
+        return acc;
+    }, [] as ResolvedIp[]);
+}
 
 function App() {
-
-    type ResolvedIp = {
-        domain: string;
-        domainIp: string;
-        timestamp: string;
-    };
+    const queryClient = useQueryClient()
     
     // get stored IP addresses
-    const {data: resolvedIps, mutate} = useMutation<ResolvedIp[], Error, string>({
+    const { mutate } = useMutation({
         mutationFn: async (domain: string) => {
             const response = await axios.post(`http://localhost:8000/api/resolve/${domain}`);
-            const storedData = response.data;
-
-            // convert storedData object into an array with domain, IP, and timestamp
-            return Object.entries(storedData)
-            .reduce((acc,[domain, domainData]:[any, any]) => {
-                const ipList = domainData.ip_addresses; // Extract the IP list
-                const timestamp = domainData.timestamp;
-
-                // Ensure it has valid data before saving
-                if (ipList.length > 0 && ipList[0].trim() !== "") {
-                    acc.push({
-                        domain,
-                        domainIp: ipList.join(", "),
-                        timestamp
-                    });
-                }
-                return acc;
-            }, [] as any);
+            return arrangeDomin( response.data as ResolvedIPs);            
+        },
+        onSuccess:(data)=> {
+            queryClient.setQueryData([ALL_IPS],data)
         },
         onError: (err) => {
-            // Roll back to the previous value
             console.error("Error fetching stored IPs:", err);
         },
     });
+    
+    
+    const {  data :resolvedIps } = useQuery({
+        queryKey: [ALL_IPS],
+        queryFn: async ()=>{
+            const response = await axios.get(`http://localhost:8000/api/all_resolved`);
+            return arrangeDomin(response.data as ResolvedIPs);
+        },
+      })
+
 
     // get local privet and public IP addresses
       const { data: localIp, isLoading: loadingLocalIp, error: localIpError, refetch: refetchLocalIp } = useQuery({
@@ -48,18 +69,13 @@ function App() {
             const response = await axios.get("http://localhost:8000/api/get_local_ip");
             return response.data;
         },
-  
-        // making sure that the query is not refetched on every render
         enabled: false, 
     });
 
-    useEffect(() => {
-      mutate("__fetch_all__");
-    }, []);
+  
 
     return (
         <div className="container">
-            {/* Fixed Top Section */}
             <div className="fixed-header">
                 <h1>IP Address Finder</h1>
                 
@@ -88,7 +104,7 @@ function App() {
             </div>
     
             <div className="scrollable-content">
-                {resolvedIps &&(
+                {resolvedIps ? (
                   <div>
                       <h3>Resolved Domains:</h3>
                         {resolvedIps.map((entry) => (
@@ -100,7 +116,7 @@ function App() {
                             </div>
                         ))}
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
 

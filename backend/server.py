@@ -12,7 +12,7 @@ app = FastAPI()
 # were accesing the server from a different origin (localhost:3000) so we need to enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,6 +55,12 @@ def resolve_domain(domain: str):
     }
 
     return get_sorted_resolved_ips()
+
+
+@app.get("/api/all_resolved")
+def get_all_resolved():
+    # Sort the dictionary by timestamp (descending, newest first)
+    return dict(sorted(resolved_ips.items(), key=lambda item: item[1]["timestamp"], reverse=True))
 
 
 @app.get("/api/get_local_ip")
